@@ -1,0 +1,10 @@
+settings.py
+*.log
+*.txt
+.vscode/
+.idea/
+Photo/
+.DS_Store
+__pycache__/
+BOT_env/
+Photo_bag.code-workspace
