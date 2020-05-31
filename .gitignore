@@ -1,6 +1,5 @@
 settings.py
 *.log
-*.txt
 .vscode/
 .idea/
 Photo/
