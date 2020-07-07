@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <title>Портфолио</title>
+  </head>
+
+  <body>
+    <div class="container-fluid">
+      <div class="row row-cols-6" align="center">
+        <div class="col">
+          <button type="button" class="btn btn-secondary btn-block">Главная</button>
+        </div>
+        <div class="col">
+          <button type="button" class="btn btn-secondary btn-block" href="{{ url_for('about') }}">Обо мне</button>
+        </div>
+        <div class="col">
+          <button type="button" class="btn btn-primary btn-block" href="{{ url_for('portfolio') }}">Портфолио</button>
+        </div>
+        <div class="col">
+          <button type="button" class="btn btn-secondary btn-block" href="{{ url_for('calendar') }}">Записаться на фотосессию</button>
+        </div>
+        <div class="col">
+          <button type="button" class="btn btn-secondary btn-block" href="{{ url_for('blog') }}">Блог</button>
+        </div>
+        <div class="col">
+          <button type="button" class="btn btn-secondary btn-block" href="{{ url_for('blog') }}">Вход/Регистрация</button>
+        </div>
+      </div>
+      <div class="card-deck">
+        <div class="card">
+          <img src="/static/images/Blog1.jpg" class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">Огоньки</h5>
+            <p class="card-text">Текст фотосессии 1</p>
+          </div>
+          <div class="card-footer">
+            <small class="text-muted">Last updated 3 mins ago</small>
+          </div>
+        </div>
+        <div class="card">
+          <img src="/static/images/Blog2.jpg" class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">Эй Желтый!</h5>
+            <p class="card-text">Текст фотосессии 2</p>
+          </div>
+          <div class="card-footer">
+            <small class="text-muted">Last updated 3 mins ago</small>
+          </div>
+        </div>
+        <div class="card">
+          <img src="/static/images/Blog3.jpg" class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">Релакс</h5>
+            <p class="card-text">Текст фотосессии 3</p>
+          </div>
+          <div class="card-footer">
+            <small class="text-muted">Last updated 3 mins ago</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+  </body>
+</html>
