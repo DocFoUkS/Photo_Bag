@@ -9,3 +9,8 @@ blueprint = Blueprint('main', __name__)
 def index():
     title = 'Главная'
     return render_template('main/index.html', page_tittle=title)
+
+@blueprint.route('/about')
+def about():
+    title = 'Главная'
+    return render_template('main/about.html', page_tittle=title)

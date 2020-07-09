@@ -9,7 +9,7 @@ from photobagapp.db import db
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, index=True)
     password = db.Column(db.String, nullable=False)
     email = db.Column(db.String(100), index=True)
     town = db.Column(db.String, index=True)
