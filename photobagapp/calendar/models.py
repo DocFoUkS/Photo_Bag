@@ -11,8 +11,7 @@ class Calendar(db.Model):
                         nullable=False)
     date_time = db.Column(db.DateTime,
                           nullable=False)
-    event_time = db.Column(db.Time,
-                           nullable=False)
+    event_time = db.Column(db.Time)
     text = db.Column(db.Text,
                      nullable=True)
 

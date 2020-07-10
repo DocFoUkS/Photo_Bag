@@ -25,11 +25,10 @@ def process_event():
     form = PhotoSessionForm()
 
     if form.validate_on_submit():
-        new_event = Calendar(user_id=User.query.filter_by(username=current_user.username).id,
-                             date_time=form.datesession.data,
-                             event_time=form.sessiontime.data,
+        new_event = Calendar(user_id=current_user.id,
+                             date_time=form.datesession.data.strftime('%d.%m.%Y') + ' ' + form.timesession.data.strftime('%H:%M'),
+                             event_time=form.session.data.strftime('%H:%M'),
                              text=form.textsession.data)
-        new_event.set_password(form.password.data)
         db.session.add(new_event)
         db.session.commit()
         flash(u'Успешная запись на фотосессию')
