@@ -23,7 +23,7 @@ class User(db.Model, UserMixin):
                                    lazy=True)
 
     def __repr__(self):
-        return '<User {}>'.fromat(self.username)
+        return '<User {}>'.format(self.username)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
