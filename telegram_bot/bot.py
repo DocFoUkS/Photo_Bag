@@ -1,25 +1,44 @@
 import logging
-from telegram.ext import Updater, CommandHandler
+import telebot
+import time
+import threading
 
 import settings
 
-logging.basicConfig(filename="bot.log", level=logging.INFO, format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
+logging.basicConfig(
+    filename="bot.log",
+    level=logging.INFO,
+    format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s' +
+    ' - %(funcName)s: %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S')
 
-def greet_user(update, context):
-    print("Вызван /start")
-    print(update)
-    update.message.reply_text("Привет!")
 
-def main():
-    mybot = Updater(settings.API_KEY, use_context=True)
+class TelegramBot():
+    def __init__(self):
+        self.bot = telebot.TeleBot(settings.API_KEY)
+        threading.Thread(target=self.bot_polling_start).start()
 
-    dp = mybot.dispatcher
-    dp.add_handler(CommandHandler("start", greet_user))  
+    def bot_polling_start(self):
+        while True:
+            try:
+                self.bot.polling(none_stop=False)
+            except Exception as err:
+                logging.info("TELEGRAMBOT ERROR: " + str(err))
+                time.sleep(3)
+                logging.info("TELEGRAMBOT RESTART")
 
-    logging.info("Бот стартовал")
-    mybot.start_polling()
-    mybot.idle()
+    def send_message(self, message):
 
-if __name__ == "__main__":
-    main()
+        logging.info("SENDING MESSAGE: " + str(message['text']))
+
+        for send_try in range(3):
+            try:
+                self.bot.send_message(message['chat_id'], str(message['text']))
+                logging.info("DONE")
+                break
+
+            except Exception as err:
+                logging.info(
+                    "TELEGRAM ERROR WHEN SENDING WELCOME ANSWER TO " +
+                    str(message['chat_id']) + ": " + str(err))
+                time.sleep(3)
