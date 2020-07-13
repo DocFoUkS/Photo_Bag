@@ -42,8 +42,3 @@ class TelegramBot():
                     "TELEGRAM ERROR WHEN SENDING WELCOME ANSWER TO " +
                     str(message['chat_id']) + ": " + str(err))
                 time.sleep(3)
-
-
-photo_bot = TelegramBot()
-message = {"chat_id": 260453746, "text": "Random test text"}
-photo_bot.send_message(message)
