@@ -3,7 +3,7 @@ import telebot
 import time
 import threading
 
-import settings
+from telegram_bot import config as c
 
 logging.basicConfig(
     filename="bot.log",
@@ -13,10 +13,12 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S')
 
 
-class TelegramBot():
+class Telegram_BOT():
     def __init__(self):
-        self.bot = telebot.TeleBot(settings.API_KEY)
-        threading.Thread(target=self.bot_polling_start).start()
+        if c.BOT_START == 0:
+            self.bot = telebot.TeleBot(c.API_KEY)
+            threading.Thread(target=self.bot_polling_start).start()
+            c.BOT_START = 1
 
     def bot_polling_start(self):
         while True:
@@ -28,9 +30,7 @@ class TelegramBot():
                 logging.info("TELEGRAMBOT RESTART")
 
     def send_message(self, message):
-
         logging.info("SENDING MESSAGE: " + str(message['text']))
-
         for send_try in range(3):
             try:
                 self.bot.send_message(message['chat_id'], str(message['text']))
