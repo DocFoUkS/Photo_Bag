@@ -15,6 +15,7 @@ from photobagapp.portfolio.models import Group_photo, Photo
 from photobagapp.portfolio.views import blueprint as portfolio_blueprint
 from photobagapp.user.models import User
 from photobagapp.user.views import blueprint as user_blueprint
+from telegram_bot.bot import Telegram_BOT
 
 
 def create_app():
