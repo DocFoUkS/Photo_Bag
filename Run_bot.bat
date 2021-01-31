@@ -1,1 +1,1 @@
-python C:\Telegram_bot\main.py
+python C:\lawer_bot\main.py

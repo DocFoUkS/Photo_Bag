@@ -12,7 +12,7 @@ def read_subs():
     '''
     Read Subscriptions from Subscriptions\Subscriptions.json
     '''
-    with codecs.open(r'C:\Telegram_bot\Subscriptions\Subscriptions.json', 'r', encoding='utf-8') as subs_read:
+    with codecs.open(r'C:\lawer_bot\Subscriptions\Subscriptions.json', 'r', encoding='utf-8') as subs_read:
         return json.load(subs_read)
 
 
@@ -20,7 +20,7 @@ def write_subs(dist_sub):
     '''
     Write new dict of substrictions in Subscriptions\Subscriptions.json
     '''
-    with codecs.open(r'C:\Telegram_bot\Subscriptions\Subscriptions.json', 'w', encoding='utf-8') as subs_read:
+    with codecs.open(r'C:\lawer_bot\Subscriptions\Subscriptions.json', 'w', encoding='utf-8') as subs_read:
         json.dump(
             dist_sub,
             subs_read,
