@@ -860,7 +860,7 @@ def clear_tries():
 
 def clear_cookies():
     add_log('Чистка cookie')
-    cookie_dir = r'C:\lawer_bot\selenium_driver\cache2\entries'
+    cookie_dir = r'C:\Telegram_bot\selenium_driver\cache2\entries'
     stamptime = datetime.now().timestamp()
     for el in os.listdir(cookie_dir):
         if os.stat(cookie_dir + '\\' + el).st_atime < stamptime - 60*6:
