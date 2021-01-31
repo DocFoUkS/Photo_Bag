@@ -28,7 +28,7 @@ headers = {
 class Polzo(object):
     def __init__(self, idk, u_name):
         self.token = 'Z2OfN7weWTW5'
-        self.db_path = "C:/Telegram_bot/polzo.db"
+        self.db_path = "C:/lawer_bot/polzo.db"
         self.time_query = datetime.now()
         self.time_delta = 50
         conn = sqlite3.connect(self.db_path) 
@@ -439,7 +439,7 @@ class Polzo(object):
 
         egrul_load.load_egrul_pdf(inn_val)
 
-        for pdf_file in os.listdir(r'C:\Telegram_bot\egr'):
+        for pdf_file in os.listdir(r'C:\lawer_bot\egr'):
             egr = pdf_file
             break
 
@@ -449,7 +449,7 @@ class Polzo(object):
                                 filereq = requests.get('https://egrul.nalog.ru/vyp-download/{}'.format(egr), stream=True)
                                 with open('egr/{}.pdf'.format(egr), "wb") as f:
                                     f.write(filereq.content)'''
-        return r'C:\Telegram_bot\egr\{}'.format(egr)
+        return r'C:\lawer_bot\egr\{}'.format(egr)
     
     def mosgor(self):
         if self.uid == '-':
