@@ -1,0 +1,466 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+	<link rel="stylesheet" type="text/css" href="themes/sudrf2_main/css/layout.css">
+	<link rel='stylesheet' type="text/css" href='themes/sudrf2_main/css/jquery-ui.css'>
+	<link rel='shortcut icon' href='images/favicon.ico' type='image/x-icon'>
+	<!--[if lte IE 7]>
+	<link rel="stylesheet" type="text/css" href='themes/sudrf2_main/css/iefix-lte7.css'><![endif]-->
+	<script type='text/javascript' src='themes/sudrf2_main/js/jquery-1.10.1.min.js'></script>
+	<script type='text/javascript' src='themes/sudrf2_main/js/jquery-migrate-1.2.1.min.js'></script>
+	<script type='text/javascript' src='themes/sudrf2_main/js/jquery-ui.min.js'></script>
+	<script type='text/javascript' src='themes/sudrf2_main/js/jquery.ui.datepicker-ru.min.js'></script>
+	<title>ГАС РФ «Правосудие»</title>
+</head>
+<body>
+<h1 id='headerMini'><a href='/'>Государственная автоматизированная система Российской Федерации «Правосудие»</a></h1><div id="content">
+	<div id="link-to-home"><span><a href="/" title="на главную">&larr;&nbsp;<u>на главную</u></a></span></div><h1 id="pgTitle"></h1>	
+	<link rel='stylesheet' href='themes/sudrf2_main/css/court_guide.css' />
+	<link rel='stylesheet' type='text/css' href='themes/sudrf2_main/css/jquery.tooltip.css' />
+	<script type='text/javascript' src='themes/sudrf2_main/js/jquery.tooltip.min.js'></script>
+
+	<script src='//api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU' type='text/javascript'></script>
+	<script type='text/javascript' src='themes/sudrf2_main/js/ya_map.js'></script>
+	<script  type='text/javascript'>
+	ya_load=false;
+	ymaps.ready(function (){ ya_load=true; });
+	var mod_id=300;
+	</script>
+	<script type='text/javascript' src='themes/sudrf2_main/js/court_guide.js'></script>
+
+		<script type='text/javascript'>
+		var txt=[];
+		txt["ms"]="Для поиска общей информации о судебном участке мирового судьи или органе обеспечения деятельности судебных участков мировых судей, организационной структуре, полномочиях, сведений о размере и порядке уплаты государственной пошлины, информации о находящихся в участке делах и принятых по ним судебным актам, порядке их обжалования, информации о порядке подачи и рассмотрения обращений граждан и прочей информации о деятельности заполните одно или несколько полей для поиска.";txt["sp"]="С помощью предложенной поисковой формы можно получить информацию, связанную с рассмотрением дел находящихся на участке мирового судьи. Для поиска выберите судебный участок и укажите номер дела. Например, 2-303/2012, где 2-303 - номер дела, 2012 - год регистрации";$(document).ready(function () { $("#spSearchArea .hidden").show();$("img.fieldTip").tooltip({
+		track: true,
+		delay: 0,
+		showURL: false,
+		showBody: " - ",
+		fade: 250
+	});
+
+	change_sud("50MS0341");
+			});
+			
+			function selCrtType(setType) {
+			$('#courtGuideCont p:first').html(txt[setType]);
+				if(setType=='ms') {
+					document.getElementById('msSearchArea').style.display='block';
+					document.getElementById('spSearchArea').style.display='none';
+					document.getElementById('msLink').className='selected';
+					document.getElementById('spLink').className='';
+				} else if(setType=='sp'){
+					document.getElementById('msSearchArea').style.display='none';
+					document.getElementById('spSearchArea').style.display='block';
+					document.getElementById('msLink').className='';
+					document.getElementById('spLink').className='selected';
+				}
+				else {
+					document.getElementById('msSearchArea').style.display='none';
+					document.getElementById('spSearchArea').style.display='none';
+					document.getElementById('msLink').className='';
+					document.getElementById('spLink').className='';
+				}
+			}
+
+			function selMsCrtType(setType) {
+				if(setType=='ms') {
+					document.getElementById('msSearchType-ms').checked=true;
+					$('#msCityTr').show();
+					$('#msStreetTr').show();
+					msCrtType='ms';
+				} else {
+					document.getElementById('msSearchType-ag').checked=true;
+					$('#msCityTr').hide();
+					$('#msStreetTr').hide();
+					msCrtType='ag';
+				}
+			}
+
+			function change_sud(vn){
+				$('#mvnkod').val(vn);
+				if(vn!='' || vn) $('#num_df').removeAttr('disabled');
+					else
+						$('#num_df').attr('disabled','disabled');
+			}
+
+			function renameNum(type,t){
+				var numd=$('#num_df');
+				var txt=$.trim(numd.val()); // delete mask chars
+					if(type){
+						if(txt==='Номер дела'){
+						numd.val('');
+						numd.attr('class','');
+						}
+					 }else{
+						if(txt===''){
+						numd.val('Номер дела');
+						numd.attr('class','textinp');
+
+						}
+					 }
+			}
+
+			function re_court_subj(val){
+				if(val>0) $('#msStreet,#msCity').removeAttr('disabled');
+					else
+						$('#msStreet,#msCity').attr('disabled','disabled');
+
+			}
+
+			function onloadpg() { /*** worlds ***/
+				ajax_ya_coord('mir');
+			var hash=window.location.hash;
+			var tser='sp';
+				if(hash!=''){
+				tser=hash.substr(-2);
+				}
+				selCrtType(tser);
+				renameNum(false);
+			    selMsCrtType('ms');
+			}
+
+
+				function getSuds(idcourt){
+				change_sud('');
+		if(idcourt==0) { $('#suds_subj').html(''); $('#spSearchArea .hidden').hide();  return; }
+				$.ajax({
+						async:false,
+						url: 'index.php',
+						data:{'id':300,'act':'ajax_search','searchtype':'sp','court_subj':idcourt,'suds_subj':'50MS0341','var':'true'},
+						type: 'GET',
+						beforeSend: function(){  },
+						success: function (data) {
+						$('#spSearchArea .hidden').show();
+						$('#suds_subj').html(data);
+						},
+						error: function (data, status, e)
+						{
+						 alert('Ошибка ответа сервера');
+						}
+						});
+
+		}
+
+
+		</script>
+	
+		<div id='ya_map' style='height: 400px;width: 500px;margin-top:10px; display:none;'></div>
+		<div id='courtGuideCont'><div class='inf_ser'>Информация о деятельности судебных участков мировых судей</div>
+		<ul class="courtTypeSelect">
+		<li id='msLink' class=""><a href="#ms" onclick="selCrtType('ms');">Найти судебный участок мирового судьи</a></li>
+		<li id='spLink' class=""><a href="#sp" onclick="selCrtType('sp');">Поиск дела</a></li>
+		</ul>
+
+		<p style='margin-bottom: 20px;'>С помощью предложенной поисковой формы можно получить информацию, связанную с рассмотрением дел находящихся на участке мирового судьи. Для поиска выберите судебный участок и укажите номер дела. Например, 2-303/2012, где 2-303 - номер дела, 2012 - год регистрации</p>
+
+		<div id='msSearchArea' style='display:none;'>
+			<form action='/index.php' method='get' name='ms_court_search' id='ms_court_search' style='padding:0; margin:0;'>
+			<input type='hidden' name='id' value='300'>
+			<input type='hidden' name='act' value='go_ms_search'>
+			<input type='hidden' name='searchtype' value='ms'>
+			<input type='hidden' name='var' value='true'>
+			<table id='courtGuideTblMs'>
+				<tr>
+					<td style='width:259px; padding: 5px 10px 5px 0; vertical-align: top;'>Я ищу:</td>
+					<td style='padding: 5px 0 5px 0; vertical-align: top;'>
+						<div><input type='radio' id='msSearchType-ms' name='ms_type' value='ms' style='border:none; background:transparent;' onclick="selMsCrtType('ms');"> участок мирового судьи</div>
+						<div><input type='radio' id='msSearchType-ag' name='ms_type' value='ag' style='border:none; background:transparent;' onclick="selMsCrtType('ag');"> орган обеспечения деятельности судебных участков мировых судей в субъекте Российской Федерации</div>
+					</td>
+				</tr>
+				<tr id='sub_ms'>
+					<td style='padding: 5px 10px 5px 0; vertical-align: top;'>Субъект Российской Федерации:&nbsp;</td>
+					<td style='padding: 5px 0 5px 0; vertical-align: top;'>
+						<select id='ms_subj' name='court_subj' onchange='re_court_subj(this.value)' style='width:490px;'>
+							<option value='0'></option>
+							<option value='22'>Алтайский край</option>
+<option value='28'>Амурская область</option>
+<option value='29'>Архангельская область</option>
+<option value='30'>Астраханская область</option>
+<option value='31'>Белгородская область</option>
+<option value='32'>Брянская область</option>
+<option value='33'>Владимирская область</option>
+<option value='34'>Волгоградская область</option>
+<option value='35'>Вологодская область</option>
+<option value='36'>Воронежская область</option>
+<option value='77'>Город Москва</option>
+<option value='78'>Город Санкт-Петербург</option>
+<option value='92'>Город Севастополь</option>
+<option value='79'>Еврейская автономная область</option>
+<option value='75'>Забайкальский край</option>
+<option value='37'>Ивановская область</option>
+<option value='38'>Иркутская область</option>
+<option value='07'>Кабардино-Балкарская Республика</option>
+<option value='39'>Калининградская область</option>
+<option value='40'>Калужская область</option>
+<option value='41'>Камчатский край</option>
+<option value='09'>Карачаево-Черкесская Республика</option>
+<option value='42'>Кемеровская область</option>
+<option value='43'>Кировская область</option>
+<option value='44'>Костромская область</option>
+<option value='23'>Краснодарский край</option>
+<option value='24'>Красноярский край</option>
+<option value='45'>Курганская область</option>
+<option value='46'>Курская область</option>
+<option value='47'>Ленинградская область</option>
+<option value='48'>Липецкая область</option>
+<option value='49'>Магаданская область</option>
+<option value='50' SELECTED>Московская область</option>
+<option value='51'>Мурманская область</option>
+<option value='83'>Ненецкий автономный округ </option>
+<option value='52'>Нижегородская область</option>
+<option value='53'>Новгородская область</option>
+<option value='54'>Новосибирская область</option>
+<option value='55'>Омская область</option>
+<option value='56'>Оренбургская область</option>
+<option value='57'>Орловская область</option>
+<option value='58'>Пензенская область</option>
+<option value='59'>Пермский край</option>
+<option value='25'>Приморский край</option>
+<option value='60'>Псковская область</option>
+<option value='01'>Республика Адыгея</option>
+<option value='02'>Республика Алтай</option>
+<option value='03'>Республика Башкортостан</option>
+<option value='04'>Республика Бурятия</option>
+<option value='05'>Республика Дагестан</option>
+<option value='06'>Республика Ингушетия</option>
+<option value='08'>Республика Калмыкия</option>
+<option value='10'>Республика Карелия</option>
+<option value='11'>Республика Коми</option>
+<option value='91'>Республика Крым</option>
+<option value='12'>Республика Марий Эл</option>
+<option value='13'>Республика Мордовия</option>
+<option value='14'>Республика Саха (Якутия)</option>
+<option value='15'>Республика Северная Осетия-Алания</option>
+<option value='16'>Республика Татарстан </option>
+<option value='17'>Республика Тыва</option>
+<option value='19'>Республика Хакасия</option>
+<option value='61'>Ростовская область</option>
+<option value='62'>Рязанская область</option>
+<option value='63'>Самарская область</option>
+<option value='64'>Саратовская область</option>
+<option value='65'>Сахалинская область</option>
+<option value='66'>Свердловская область</option>
+<option value='67'>Смоленская область</option>
+<option value='26'>Ставропольский край</option>
+<option value='68'>Тамбовская область</option>
+<option value='69'>Тверская область</option>
+<option value='70'>Томская область</option>
+<option value='71'>Тульская область</option>
+<option value='72'>Тюменская область</option>
+<option value='18'>Удмуртская Республика</option>
+<option value='73'>Ульяновская область</option>
+<option value='27'>Хабаровский край</option>
+<option value='86'>Ханты-Мансийский автономный округ - Югра (Тюменская область)</option>
+<option value='74'>Челябинская область</option>
+<option value='20'>Чеченская Республика</option>
+<option value='21'>Чувашская Республика - Чувашия</option>
+<option value='87'>Чукотский автономный округ</option>
+<option value='89'>Ямало-Ненецкий автономный округ</option>
+<option value='76'>Ярославская область</option>
+
+						</select></td>
+					<td style='padding: 7px 0 5px 0; vertical-align: top;'><img src='/images/help.gif'  align='absmiddle' class='fieldTip' title='Выберите субъект'></td>
+				</tr>
+
+				<tr id='msCityTr'>
+					<td style='width:259px; padding: 5px 10px 5px 0; vertical-align: top;'>Населенный пункт:</td>
+					<td style='padding: 5px 0 5px 0; vertical-align: top;'><input type='text' id='msCity' name='ms_city'  value='' style='width:484px;'><br><span style='font-size:11px;'>Не менее 3 символов</span></td>
+					<td style='padding: 7px 0 5px 0; vertical-align: top;'><img src='/images/help.gif'  align='absmiddle' class='fieldTip' title='Введите наименование или часть наименования населенного пункта для поиска по территориальной подсудности (город, сельсовет, войсковая часть и т.д.)'></td>
+				</tr>
+				<tr id='msStreetTr'>
+					<td style='padding: 5px 10px 5px 0; vertical-align: top;'>Улица:</td>
+					<td style='padding: 5px 0 5px 0; vertical-align: top;'><input type='text' id='msStreet' name='ms_street'  value='' style='width:484px;'><br><span style='font-size:11px;'>Не менее 3 символов</span></td>
+					<td style='padding: 7px 0 5px 0; vertical-align: top;'><img src='/images/help.gif'  align='absmiddle' class='fieldTip' title='Введите наименование или часть наименования улицы для поиска по территориальной подсудности'></td>
+				</tr>
+
+				<tr><td><span id='all_map'>[<a href='#'>все участки на карте</a>]</span></td></tr>
+
+				</table>
+
+
+				<table style='width:100%;'>
+				<tr>
+					<td style='width:259px; padding: 5px 10px 5px 0; vertical-align: top;'></td>
+					<td style='padding: 5px 0 5px 0; vertical-align: top;'>
+						<input type='submit' class='form-button' value='Найти' style='width: 150px;'>&nbsp;&nbsp;&nbsp;
+						<input type='button' class='form-button' value='Очистить форму'  style='width: 150px;' onclick="window.location='index.php?id=300&searchtype=ms&var=true'"></td>
+				</tr>
+
+				<tr>
+					<td colspan='2'></td></tr></table></form>
+
+				<div id='ya_all_div'>
+				Для поиска общей информации о суде, организационной структуре, полномочиях, сведений о размере и порядке уплаты государственной пошлины, информации о находящихся в суде делах и принятых по ним судебным актам, порядке их обжалования, информации о порядке подачи и рассмотрения обращений граждан и прочей информации о деятельности <a href='#' id='back_form'>перейдите к форме поиска</a>.
+
+				<div id='ya_map_all'><div class='ajaxLoading'>Идет загрузка данных...</div></div>
+				<div id='ya_map_info' class='sud_info'></div>
+				</div>
+
+	</div>
+
+
+
+	<script type='text/javascript'>
+		function pages(id){
+			var url=window.location.href;
+			if(/page=[0-9]+/.test(url))
+				url=url.replace(/page=[0-9]+/,'page='+id);
+			else url+='&page='+id;
+			window.location.href=url;
+		}
+	</script>
+
+	<div id='spSearchArea'  style='display:none;'>
+
+		<form action='/index.php' method='get' name='court_search' OnSubmit='$("#num_d").val($("#num_df").val());$("#res_show").hide()' id='court_search' style='padding:0; margin:0;'>
+			<input type='hidden' name='id' value='300'>
+			<input type='hidden' name='act' value='go_sp_search'>
+			<input type='hidden' name='searchtype' value='sp'>
+			<input type='hidden' name='mvnkod' id='mvnkod' value='50MS0341'>
+			<input type='hidden' name='var' value='true'>
+			<input type='hidden' id='num_d' name='num_d' value=''>
+			<table id='courtGuideTbl'>
+
+				<tr>
+					<td style='padding: 5px 10px 5px 0; vertical-align: top;'>Субъект Российской Федерации:&nbsp;</td>
+					<td style='padding: 5px 0 5px 0; vertical-align: top;'>
+				<select id='court_subj' name='court_subj' style='width:490px;' onchange='getSuds(this.value)'>
+							<option value='0'></option>
+							<option value='22'>Алтайский край</option>
+<option value='28'>Амурская область</option>
+<option value='29'>Архангельская область</option>
+<option value='30'>Астраханская область</option>
+<option value='31'>Белгородская область</option>
+<option value='32'>Брянская область</option>
+<option value='33'>Владимирская область</option>
+<option value='34'>Волгоградская область</option>
+<option value='35'>Вологодская область</option>
+<option value='36'>Воронежская область</option>
+<option value='77'>Город Москва</option>
+<option value='78'>Город Санкт-Петербург</option>
+<option value='92'>Город Севастополь</option>
+<option value='79'>Еврейская автономная область</option>
+<option value='75'>Забайкальский край</option>
+<option value='37'>Ивановская область</option>
+<option value='38'>Иркутская область</option>
+<option value='07'>Кабардино-Балкарская Республика</option>
+<option value='39'>Калининградская область</option>
+<option value='40'>Калужская область</option>
+<option value='41'>Камчатский край</option>
+<option value='09'>Карачаево-Черкесская Республика</option>
+<option value='42'>Кемеровская область</option>
+<option value='43'>Кировская область</option>
+<option value='44'>Костромская область</option>
+<option value='23'>Краснодарский край</option>
+<option value='24'>Красноярский край</option>
+<option value='45'>Курганская область</option>
+<option value='46'>Курская область</option>
+<option value='47'>Ленинградская область</option>
+<option value='48'>Липецкая область</option>
+<option value='49'>Магаданская область</option>
+<option value='50' SELECTED>Московская область</option>
+<option value='51'>Мурманская область</option>
+<option value='83'>Ненецкий автономный округ </option>
+<option value='52'>Нижегородская область</option>
+<option value='53'>Новгородская область</option>
+<option value='54'>Новосибирская область</option>
+<option value='55'>Омская область</option>
+<option value='56'>Оренбургская область</option>
+<option value='57'>Орловская область</option>
+<option value='58'>Пензенская область</option>
+<option value='59'>Пермский край</option>
+<option value='25'>Приморский край</option>
+<option value='60'>Псковская область</option>
+<option value='01'>Республика Адыгея</option>
+<option value='02'>Республика Алтай</option>
+<option value='03'>Республика Башкортостан</option>
+<option value='04'>Республика Бурятия</option>
+<option value='05'>Республика Дагестан</option>
+<option value='06'>Республика Ингушетия</option>
+<option value='08'>Республика Калмыкия</option>
+<option value='10'>Республика Карелия</option>
+<option value='11'>Республика Коми</option>
+<option value='91'>Республика Крым</option>
+<option value='12'>Республика Марий Эл</option>
+<option value='13'>Республика Мордовия</option>
+<option value='14'>Республика Саха (Якутия)</option>
+<option value='15'>Республика Северная Осетия-Алания</option>
+<option value='16'>Республика Татарстан </option>
+<option value='17'>Республика Тыва</option>
+<option value='19'>Республика Хакасия</option>
+<option value='61'>Ростовская область</option>
+<option value='62'>Рязанская область</option>
+<option value='63'>Самарская область</option>
+<option value='64'>Саратовская область</option>
+<option value='65'>Сахалинская область</option>
+<option value='66'>Свердловская область</option>
+<option value='67'>Смоленская область</option>
+<option value='26'>Ставропольский край</option>
+<option value='68'>Тамбовская область</option>
+<option value='69'>Тверская область</option>
+<option value='70'>Томская область</option>
+<option value='71'>Тульская область</option>
+<option value='72'>Тюменская область</option>
+<option value='18'>Удмуртская Республика</option>
+<option value='73'>Ульяновская область</option>
+<option value='27'>Хабаровский край</option>
+<option value='86'>Ханты-Мансийский автономный округ - Югра (Тюменская область)</option>
+<option value='74'>Челябинская область</option>
+<option value='20'>Чеченская Республика</option>
+<option value='21'>Чувашская Республика - Чувашия</option>
+<option value='87'>Чукотский автономный округ</option>
+<option value='89'>Ямало-Ненецкий автономный округ</option>
+<option value='76'>Ярославская область</option>
+
+				</select></td>
+					<td style='padding: 7px 0 5px 10px; vertical-align: top;'><img src='/images/help.gif'  align='absmiddle' class='fieldTip' title='Выберите субъект'></td>
+				</tr>
+
+				<tr class='hidden'>
+					<td style='padding: 5px 10px 5px 0; vertical-align: top;'>Наименование суда:</td>
+					<td style='padding: 5px 0 5px 0; vertical-align: top;'>
+					<select id='suds_subj' onchange='change_sud(this.value)' name='suds_subj' style='width:490px;'>
+						<option></option><option value="50MS0001" >Судебный участок № 1 мирового судьи Балашихинского судебного района Московской области</option><option value="50MS0002" >Судебный участок № 2 мирового судьи Балашихинского судебного района Московской области</option><option value="50MS0003" >Судебный участок № 3 мирового судьи Балашихинского судебного района Московской области</option><option value="50MS0004" >Судебный участок № 4 мирового судьи Балашихинского судебного района Московской области</option><option value="50MS0005" >Судебный участок № 5 мирового судьи Балашихинского судебного района Московской области</option><option value="50MS0006" >Судебный участок № 6 мирового судьи Балашихинского судебного района Московской области</option><option value="50MS0007" >Судебный участок № 7 мирового судьи Балашихинского судебного района Московской области</option><option value="50MS0008" >Судебный участок № 8 мирового судьи Видновского судебного района Московской области</option><option value="50MS0009" >Судебный участок № 9 мирового судьи Видновского судебного района Московской области</option><option value="50MS0010" >Судебный участок № 10 мирового судьи Видновского судебного района Московской области</option><option value="50MS0011" >Судебный участок № 11 мирового судьи Видновского судебного района Московской области</option><option value="50MS0014" >Судебный участок № 14 мирового судьи Волоколамского судебного района Московской области</option><option value="50MS0015" >Судебный участок № 15 мирового судьи Волоколамского судебного района Московской области</option><option value="50MS0016" >Судебный участок № 16 мирового судьи Воскресенского судебного района Московской области</option><option value="50MS0017" >Судебный участок № 17 мирового судьи Воскресенского судебного района Московской области</option><option value="50MS0018" >Судебный участок № 18 мирового судьи Воскресенского судебного района Московской области</option><option value="50MS0019" >Судебный участок № 19 мирового судьи Воскресенского судебного района Московской области</option><option value="50MS0020" >Судебный участок № 20 мирового судьи Воскресенского судебного района Московской области</option><option value="50MS0021" >Судебный участок № 21 мирового судьи Воскресенского судебного района Московской области</option><option value="50MS0022" >Судебный участок № 22 мирового судьи Воскресенского судебного района Московской области</option><option value="50MS0023" >Судебный участок № 23 мирового судьи Дмитровского судебного района Московской области</option><option value="50MS0024" >Судебный участок № 24 мирового судьи Дмитровского судебного района Московской области</option><option value="50MS0025" >Судебный участок № 25 мирового судьи Дмитровского судебного района Московской области</option><option value="50MS0026" >Судебный участок № 26 мирового судьи Дмитровского судебного района Московской области</option><option value="50MS0027" >Судебный участок № 27 мирового судьи Дмитровского судебного района Московской области</option><option value="50MS0028" >Судебный участок № 28 мирового судьи Дмитровского судебного района Московской области</option><option value="50MS0029" >Судебный участок № 29 мирового судьи Дмитровского судебного района Московской области</option><option value="50MS0030" >Судебный участок № 30 мирового судьи Долгопрудненского судебного района Московской области</option><option value="50MS0031" >Судебный участок № 31 мирового судьи Долгопрудненского судебного района Московской области</option><option value="50MS0032" >Судебный участок № 32 мирового судьи Долгопрудненского судебного района Московской области</option><option value="50MS0033" >Судебный участок № 33 мирового судьи Домодедовского судебного района Московской области</option><option value="50MS0034" >Судебный участок № 34 мирового судьи Домодедовского судебного района Московской области</option><option value="50MS0035" >Судебный участок № 35 мирового судьи Домодедовского судебного района Московской области</option><option value="50MS0036" >Судебный участок № 36 мирового судьи Домодедовского судебного района Московской области</option><option value="50MS0037" >Судебный участок № 37 мирового судьи Домодедовского судебного района Московской области</option><option value="50MS0038" >Судебный участок № 38 мирового судьи Домодедовского судебного района Московской области</option><option value="50MS0039" >Судебный участок № 39 мирового судьи Дубненского судебного района Московской области</option><option value="50MS0040" >Судебный участок № 40 мирового судьи Дубненского судебного района Московской области</option><option value="50MS0041" >Судебный участок № 41 мирового судьи Дубненского судебного района Московской области</option><option value="50MS0042" >Судебный участок № 42 мирового судьи Егорьевского судебного района Московской области</option><option value="50MS0043" >Судебный участок № 43 мирового судьи Егорьевского судебного района Московской области</option><option value="50MS0044" >Судебный участок № 44 мирового судьи Егорьевского судебного района Московской области</option><option value="50MS0045" >Судебный участок № 45 мирового судьи Егорьевского судебного района Московской области</option><option value="50MS0046" >Судебный участок № 46 мирового судьи Егорьевского судебного района Московской области</option><option value="50MS0047" >Судебный участок № 47 мирового судьи Железнодорожного судебного района Московской области</option><option value="50MS0048" >Судебный участок № 48 мирового судьи Железнодорожного судебного района Московской области</option><option value="50MS0049" >Судебный участок № 49 мирового судьи Железнодорожного судебного района Московской области</option><option value="50MS0050" >Судебный участок № 50 мирового судьи Железнодорожного судебного района Московской области</option><option value="50MS0051" >Судебный участок № 51 мирового судьи Железнодорожного судебного района Московской области</option><option value="50MS0052" >Судебный участок № 52 мирового судьи Жуковского судебного района Московской области</option><option value="50MS0053" >Судебный участок № 53 мирового судьи Жуковского судебного района Московской области</option><option value="50MS0054" >Судебный участок № 54 мирового судьи Жуковского судебного района Московской области</option><option value="50MS0055" >Судебный участок № 55 мирового судьи Жуковского судебного района Московской области</option><option value="50MS0056" >Судебный участок № 56 мирового судьи Зарайского судебного района Московской области</option><option value="50MS0057" >Судебный участок № 57 мирового судьи Зарайского судебного района Московской области</option><option value="50MS0058" >Судебный участок № 58 мирового судьи Звенигородского судебного района Московской области</option><option value="50MS0059" >Судебный участок № 59 мирового судьи Ивантеевского судебного района Московской области</option><option value="50MS0060" >Судебный участок № 60 мирового судьи Ивантеевского судебного района Московской области</option><option value="50MS0061" >Судебный участок № 61 мирового судьи Истринского судебного района Московской области</option><option value="50MS0062" >Судебный участок № 62 мирового судьи Истринского судебного района Московской области</option><option value="50MS0063" >Судебный участок № 63 мирового судьи Истринского судебного района Московской области</option><option value="50MS0064" >Судебный участок № 64 мирового судьи Истринского судебного района Московской области</option><option value="50MS0065" >Судебный участок № 65 мирового судьи Истринского судебного района Московской области</option><option value="50MS0066" >Судебный участок № 66 мирового судьи Каширского судебного района Московской области</option><option value="50MS0067" >Судебный участок № 67 мирового судьи Каширского судебного района Московской области</option><option value="50MS0068" >Судебный участок № 68 мирового судьи Каширского судебного района Московской области</option><option value="50MS0069" >Судебный участок № 69 мирового судьи Климовского судебного района Московской области</option><option value="50MS0070" >Судебный участок № 70 мирового судьи Климовского судебного района Московской области</option><option value="50MS0071" >Судебный участок № 71 мирового судьи Клинского судебного района Московской области</option><option value="50MS0072" >Судебный участок № 72 мирового судьи Клинского судебного района Московской области</option><option value="50MS0073" >Судебный участок № 73 мирового судьи Клинского судебного района Московской области</option><option value="50MS0074" >Судебный участок № 74 мирового судьи Клинского судебного района Московской области</option><option value="50MS0075" >Судебный участок № 75 мирового судьи Клинского судебного района Московской области</option><option value="50MS0076" >Судебный участок № 76 мирового судьи Клинского судебного района Московской области</option><option value="50MS0077" >Судебный участок № 77 мирового судьи Коломенского судебного района Московской области</option><option value="50MS0078" >Судебный участок № 78 мирового судьи Коломенского судебного района Московской области</option><option value="50MS0079" >Судебный участок № 79 мирового судьи Коломенского судебного района Московской области</option><option value="50MS0080" >Судебный участок № 80 мирового судьи Коломенского судебного района Московской области</option><option value="50MS0081" >Судебный участок № 81 мирового судьи Коломенского судебного района Московской области</option><option value="50MS0082" >Судебный участок № 82 мирового судьи Коломенского судебного района Московской области</option><option value="50MS0083" >Судебный участок № 83 мирового судьи Коломенского судебного района Московской области</option><option value="50MS0084" >Судебный участок № 84 мирового судьи Коломенского судебного района Московской области</option><option value="50MS0085" >Судебный участок № 85 мирового судьи Коломенского судебного района Московской области</option><option value="50MS0086" >Судебный участок № 86 мирового судьи Королевского судебного района Московской области</option><option value="50MS0087" >Судебный участок № 87 мирового судьи Королевского судебного района Московской области</option><option value="50MS0088" >Судебный участок № 88 мирового судьи Королевского судебного района Московской области</option><option value="50MS0089" >Судебный участок № 89 мирового судьи Королевского судебного района Московской области</option><option value="50MS0090" >Судебный участок № 90 мирового судьи Королевского судебного района Московской области</option><option value="50MS0091" >Судебный участок № 91 мирового судьи Королевского судебного района Московской области</option><option value="50MS0092" >Судебный участок № 92 мирового судьи Королевского судебного района Московской области</option><option value="50MS0093" >Судебный участок № 93 мирового судьи Королевского судебного района Московской области</option><option value="50MS0094" >Судебный участок № 94 мирового судьи Красногорского судебного района Московской области</option><option value="50MS0095" >Судебный участок № 95 мирового судьи Красногорского судебного района Московской области</option><option value="50MS0096" >Судебный участок № 96 мирового судьи Красногорского судебного района Московской области</option><option value="50MS0097" >Судебный участок № 97 мирового судьи Красногорского судебного района Московской области</option><option value="50MS0098" >Судебный участок № 98 мирового судьи Красногорского судебного района Московской области</option><option value="50MS0099" >Судебный участок № 99 мирового судьи Красногорского судебного района Московской области</option><option value="50MS0100" >Судебный участок № 100 мирового судьи Красногорского судебного района Московской области</option><option value="50MS0101" >Судебный участок № 101 мирового судьи Лобненского судебного района Московской области</option><option value="50MS0102" >Судебный участок № 102 мирового судьи Лобненского судебного района Московской области</option><option value="50MS0103" >Судебный участок № 103 мирового судьи Лобненского судебного района Московской области</option><option value="50MS0104" >Судебный участок № 104 мирового судьи Лотошинского судебного района Московской области</option><option value="50MS0105" >Судебный участок № 105 мирового судьи Луховицкого судебного района Московской области</option><option value="50MS0106" >Судебный участок № 106 мирового судьи Луховицкого судебного района Московской области</option><option value="50MS0107" >Судебный участок № 107 мирового судьи Луховицкого судебного района Московской области</option><option value="50MS0108" >Судебный участок № 108 мирового судьи Лыткаринского судебного района Московской области</option><option value="50MS0109" >Судебный участок № 109 мирового судьи Лыткаринского судебного района Московской области</option><option value="50MS0110" >Судебный участок № 110 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0111" >Судебный участок № 111 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0112" >Судебный участок № 112 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0113" >Судебный участок № 113 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0114" >Судебный участок № 114 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0115" >Судебный участок № 115 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0116" >Судебный участок № 116 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0117" >Судебный участок № 117 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0118" >Судебный участок № 118 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0119" >Судебный участок № 119 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0120" >Судебный участок № 120 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0121" >Судебный участок № 121 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0122" >Судебный участок № 122 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0123" >Судебный участок № 123 мирового судьи Можайского судебного района Московской области</option><option value="50MS0124" >Судебный участок № 124 мирового судьи Можайского судебного района Московской области</option><option value="50MS0125" >Судебный участок № 125 мирового судьи Можайского судебного района Московской области</option><option value="50MS0126" >Судебный участок № 126 мирового судьи Мытищинского судебного района Московской области</option><option value="50MS0127" >Судебный участок № 127 мирового судьи Мытищинского судебного района Московской области</option><option value="50MS0128" >Судебный участок № 128 мирового судьи Мытищинского судебного района Московской области</option><option value="50MS0129" >Судебный участок № 129 мирового судьи Мытищинского судебного района Московской области</option><option value="50MS0130" >Судебный участок № 130 мирового судьи Мытищинского судебного района Московской области</option><option value="50MS0131" >Судебный участок № 131 мирового судьи Мытищинского судебного района Московской области</option><option value="50MS0132" >Судебный участок № 132 мирового судьи Мытищинского судебного района Московской области</option><option value="50MS0133" >Судебный участок № 133 мирового судьи Мытищинского судебного района Московской области</option><option value="50MS0134" >Судебный участок № 134 мирового судьи Наро-Фоминского судебного района Московской области</option><option value="50MS0135" >Судебный участок № 135 мирового судьи Наро-Фоминского судебного района Московской области</option><option value="50MS0136" >Судебный участок № 136 мирового судьи Наро-Фоминского судебного района Московской области</option><option value="50MS0137" >Судебный участок № 137 мирового судьи Наро-Фоминского судебного района Московской области</option><option value="50MS0139" >Судебный участок № 139 мирового судьи Наро-Фоминского судебного района Московской области</option><option value="50MS0140" >Судебный участок № 140 мирового судьи Наро-Фоминского судебного района Московской области</option><option value="50MS0141" >Судебный участок № 141 мирового судьи Наро-Фоминского судебного района Московской области</option><option value="50MS0142" >Судебный участок № 142 мирового судьи Ногинского судебного района Московской области</option><option value="50MS0143" >Судебный участок № 143 мирового судьи Ногинского судебного района Московской области</option><option value="50MS0144" >Судебный участок № 144 мирового судьи Ногинского судебного района Московской области</option><option value="50MS0145" >Судебный участок № 145 мирового судьи Ногинского судебного района Московской области</option><option value="50MS0146" >Судебный участок № 146 мирового судьи Ногинского судебного района Московской области</option><option value="50MS0147" >Судебный участок № 147 мирового судьи Ногинского судебного района Московской области</option><option value="50MS0148" >Судебный участок № 148 мирового судьи Ногинского судебного района Московской области</option><option value="50MS0149" >Судебный участок № 149 мирового судьи Ногинского судебного района Московской области</option><option value="50MS0150" >Судебный участок № 150 мирового судьи Ногинского судебного района Московской области</option><option value="50MS0151" >Судебный участок № 151 мирового судьи Ногинского судебного района Московской области</option><option value="50MS0152" >Судебный участок № 152 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0153" >Судебный участок № 153 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0154" >Судебный участок № 154 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0155" >Судебный участок № 155 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0156" >Судебный участок № 156 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0157" >Судебный участок № 157 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0158" >Судебный участок № 158 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0159" >Судебный участок № 159 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0160" >Судебный участок № 160 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0161" >Судебный участок № 161 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0162" >Судебный участок № 162 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0163" >Судебный участок № 163 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0164" >Судебный участок № 164 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0165" >Судебный участок № 165 мирового судьи Озерского судебного района Московской области</option><option value="50MS0166" >Судебный участок № 166 мирового судьи Озерского судебного района Московской области</option><option value="50MS0167" >Судебный участок № 167 мирового судьи Орехово-Зуевского судебного района Московской области</option><option value="50MS0168" >Судебный участок № 168 мирового судьи Орехово-Зуевского судебного района Московской области</option><option value="50MS0169" >Судебный участок № 169 мирового судьи Орехово-Зуевского судебного района Московской области</option><option value="50MS0170" >Судебный участок № 170 мирового судьи Орехово-Зуевского судебного района Московской области</option><option value="50MS0171" >Судебный участок № 171 мирового судьи Орехово-Зуевского судебного района Московской области</option><option value="50MS0172" >Судебный участок № 172 мирового судьи Орехово-Зуевского судебного района Московской области</option><option value="50MS0173" >Судебный участок № 173 мирового судьи Орехово-Зуевского судебного района Московской области</option><option value="50MS0174" >Судебный участок № 174 мирового судьи Орехово-Зуевского судебного района Московской области</option><option value="50MS0175" >Судебный участок № 175 мирового судьи Орехово-Зуевского судебного района Московской области</option><option value="50MS0176" >Судебный участок № 176 мирового судьи Орехово-Зуевского судебного района Московской области</option><option value="50MS0177" >Судебный участок № 177 мирового судьи Орехово-Зуевского судебного района Московской области</option><option value="50MS0178" >Судебный участок № 178 мирового судьи Павлово-Посадского судебного района Московской области</option><option value="50MS0179" >Судебный участок № 179 мирового судьи Павлово-Посадского судебного района Московской области</option><option value="50MS0180" >Судебный участок № 180 мирового судьи Павлово-Посадского судебного района Московской области</option><option value="50MS0181" >Судебный участок № 181 мирового судьи Павлово-Посадского судебного района Московской области</option><option value="50MS0182" >Судебный участок № 182 мирового судьи Павлово-Посадского судебного района Московской области</option><option value="50MS0183" >Судебный участок № 183 мирового судьи Подольского судебного района Московской области</option><option value="50MS0184" >Судебный участок № 184 мирового судьи Подольского судебного района Московской области</option><option value="50MS0185" >Судебный участок № 185 мирового судьи Подольского судебного района Московской области</option><option value="50MS0186" >Судебный участок № 186 мирового судьи Подольского судебного района Московской области</option><option value="50MS0187" >Судебный участок № 187 мирового судьи Подольского судебного района Московской области</option><option value="50MS0188" >Судебный участок № 188 мирового судьи Подольского судебного района Московской области</option><option value="50MS0189" >Судебный участок № 189 мирового судьи Подольского судебного района Московской области</option><option value="50MS0190" >Судебный участок № 190 мирового судьи Подольского судебного района Московской области</option><option value="50MS0191" >Судебный участок № 191 мирового судьи Подольского судебного района Московской области</option><option value="50MS0194" >Судебный участок № 194 мирового судьи Подольского судебного района Московской области</option><option value="50MS0198" >Судебный участок № 198 мирового судьи Протвинского судебного района Московской области</option><option value="50MS0199" >Судебный участок № 199 мирового судьи Протвинского судебного района Московской области</option><option value="50MS0200" >Судебный участок № 200 мирового судьи Пушкинского судебного района Московской области</option><option value="50MS0201" >Судебный участок № 201 мирового судьи Пушкинского судебного района Московской области</option><option value="50MS0202" >Судебный участок № 202 мирового судьи Пушкинского судебного района Московской области</option><option value="50MS0203" >Судебный участок № 203 мирового судьи Пушкинского судебного района Московской области</option><option value="50MS0204" >Судебный участок № 204 мирового судьи Пушкинского судебного района Московской области</option><option value="50MS0205" >Судебный участок № 205 мирового судьи Пушкинского судебного района Московской области</option><option value="50MS0206" >Судебный участок № 206 мирового судьи Пушкинского судебного района Московской области</option><option value="50MS0207" >Судебный участок № 207 мирового судьи Пушкинского судебного района Московской области</option><option value="50MS0208" >Судебный участок № 208 мирового судьи Пущинского судебного района Московской области</option><option value="50MS0209" >Судебный участок № 209 мирового судьи Раменского судебного района Московской области</option><option value="50MS0210" >Судебный участок № 210 мирового судьи Раменского судебного района Московской области</option><option value="50MS0211" >Судебный участок № 211 мирового судьи Раменского судебного района Московской области</option><option value="50MS0212" >Судебный участок № 212 мирового судьи Раменского судебного района Московской области</option><option value="50MS0213" >Судебный участок № 213 мирового судьи Раменского судебного района Московской области</option><option value="50MS0214" >Судебный участок № 214 мирового судьи Раменского судебного района Московской области</option><option value="50MS0215" >Судебный участок № 215 мирового судьи Раменского судебного района Московской области</option><option value="50MS0216" >Судебный участок № 216 мирового судьи Раменского судебного района Московской области</option><option value="50MS0217" >Судебный участок № 217 мирового судьи Раменского судебного района Московской области</option><option value="50MS0218" >Судебный участок № 218 мирового судьи Раменского судебного района Московской области</option><option value="50MS0219" >Судебный участок № 219 мирового судьи Реутовского судебного района Московской области</option><option value="50MS0220" >Судебный участок № 220 мирового судьи Реутовского судебного района Московской области</option><option value="50MS0221" >Судебный участок № 221 мирового судьи Реутовского судебного района Московской области</option><option value="50MS0222" >Судебный участок № 222 мирового судьи Рузского судебного района Московской области</option><option value="50MS0223" >Судебный участок № 223 мирового судьи Рузского судебного района Московской области</option><option value="50MS0224" >Судебный участок № 224 мирового судьи Рузского судебного района Московской области</option><option value="50MS0225" >Судебный участок № 225 мирового судьи Сергиево-Посадского судебного района Московской области</option><option value="50MS0226" >Судебный участок № 226 мирового судьи Сергиево-Посадского судебного района Московской области</option><option value="50MS0227" >Судебный участок № 227 мирового судьи Сергиево-Посадского судебного района Московской области</option><option value="50MS0228" >Судебный участок № 228 мирового судьи Сергиево-Посадского судебного района Московской области</option><option value="50MS0229" >Судебный участок № 229 мирового судьи Сергиево-Посадского судебного района Московской области</option><option value="50MS0230" >Судебный участок № 230 мирового судьи Сергиево-Посадского судебного района Московской области</option><option value="50MS0231" >Судебный участок № 231 мирового судьи Сергиево-Посадского судебного района Московской области</option><option value="50MS0232" >Судебный участок № 232 мирового судьи Сергиево-Посадского судебного района Московской области</option><option value="50MS0233" >Судебный участок № 233 мирового судьи Сергиево-Посадского судебного района Московской области</option><option value="50MS0234" >Судебный участок № 234 мирового судьи Сергиево-Посадского судебного района Московской области</option><option value="50MS0235" >Судебный участок № 235 мирового судьи Серебряно-Прудского судебного района Московской области</option><option value="50MS0236" >Судебный участок № 236 мирового судьи Серпуховского судебного района Московской области</option><option value="50MS0237" >Судебный участок № 237 мирового судьи Серпуховского судебного района Московской области</option><option value="50MS0238" >Судебный участок № 238 мирового судьи Серпуховского судебного района Московской области</option><option value="50MS0239" >Судебный участок № 239 мирового судьи Серпуховского судебного района Московской области</option><option value="50MS0240" >Судебный участок № 240 мирового судьи Серпуховского судебного района Московской области</option><option value="50MS0241" >Судебный участок № 241 мирового судьи Серпуховского судебного района Московской области</option><option value="50MS0242" >Судебный участок № 242 мирового судьи Серпуховского судебного района Московской области</option><option value="50MS0243" >Судебный участок № 243 мирового судьи Серпуховского судебного района Московской области</option><option value="50MS0244" >Судебный участок № 244 мирового судьи Солнечногорского судебного района Московской области</option><option value="50MS0245" >Судебный участок № 245 мирового судьи Солнечногорского судебного района Московской области</option><option value="50MS0246" >Судебный участок № 246 мирового судьи Солнечногорского судебного района Московской области</option><option value="50MS0247" >Судебный участок № 247 мирового судьи Солнечногорского судебного района Московской области</option><option value="50MS0248" >Судебный участок № 248 мирового судьи Солнечногорского судебного района Московской области</option><option value="50MS0249" >Судебный участок № 249  мирового судьи Солнечногорского судебного района Московской области</option><option value="50MS0250" >Судебный участок № 250 мирового судьи Ступинского судебного района Московской области</option><option value="50MS0251" >Судебный участок № 251 мирового судьи Ступинского судебного района Московской области</option><option value="50MS0252" >Судебный участок № 252 мирового судьи Ступинского судебного района Московской области</option><option value="50MS0253" >Судебный участок № 253 мирового судьи Ступинского судебного района Московской области</option><option value="50MS0254" >Судебный участок № 254 мирового судьи Ступинского судебного района Московской области</option><option value="50MS0255" >Судебный участок № 255 мирового судьи Талдомского судебного района Московской области</option><option value="50MS0256" >Судебный участок № 256 мирового судьи Талдомского судебного района Московской области</option><option value="50MS0257" >Судебный участок № 257 мирового судьи Химкинского судебного района Московской области</option><option value="50MS0258" >Судебный участок № 258 мирового судьи Химкинского судебного района Московской области</option><option value="50MS0259" >Судебный участок № 259 мирового судьи Химкинского судебного района Московской области</option><option value="50MS0260" >Судебный участок № 260 мирового судьи Химкинского судебного района Московской области</option><option value="50MS0261" >Судебный участок № 261 мирового судьи Химкинского судебного района Московской области</option><option value="50MS0262" >Судебный участок № 262 мирового судьи Химкинского судебного района Московской области</option><option value="50MS0263" >Судебный участок № 263 мирового судьи Химкинского судебного района Московской области</option><option value="50MS0264" >Судебный участок № 264 мирового судьи Химкинского судебного района Московской области</option><option value="50MS0265" >Судебный участок № 265 мирового судьи Чеховского судебного района Московской области</option><option value="50MS0266" >Судебный участок № 266 мирового судьи Чеховского судебного района Московской области</option><option value="50MS0267" >Судебный участок № 267 мирового судьи Чеховского судебного района Московской области</option><option value="50MS0268" >Судебный участок № 268 мирового судьи Чеховского судебного района Московской области</option><option value="50MS0269" >Судебный участок № 269 мирового судьи Шатурского судебного района Московской области</option><option value="50MS0270" >Судебный участок № 270 мирового судьи Шатурского судебного района Московской области</option><option value="50MS0271" >Судебный участок № 271 мирового судьи Шатурского судебного района Московской области</option><option value="50MS0272" >Судебный участок № 272 мирового судьи Шатурского судебного района Московской области</option><option value="50MS0273" >Судебный участок № 273 мирового судьи Шаховского судебного района Московской области</option><option value="50MS0274" >Судебный участок № 274 мирового судьи Щелковского судебного района Московской области</option><option value="50MS0275" >Судебный участок № 275 мирового судьи Щелковского судебного района Московской области</option><option value="50MS0276" >Судебный участок № 276 мирового судьи Щелковского судебного района Московской области</option><option value="50MS0277" >Судебный участок № 277 мирового судьи Щелковского судебного района Московской области</option><option value="50MS0278" >Судебный участок № 278 мирового судьи Щелковского судебного района Московской области</option><option value="50MS0279" >Судебный участок № 279 мирового судьи Щелковского судебного района Московской области</option><option value="50MS0280" >Судебный участок № 280 мирового судьи Щелковского судебного района Московской области</option><option value="50MS0281" >Судебный участок № 281 мирового судьи Щелковского судебного района Московской области</option><option value="50MS0282" >Судебный участок № 282 мирового судьи Щелковского судебного района Московской области</option><option value="50MS0283" >Судебный участок № 283 мирового судьи Щелковского судебного района Московской области</option><option value="50MS0284" >Судебный участок № 284 мирового судьи Щелковского судебного района Московской области</option><option value="50MS0285" >Судебный участок № 285 мирового судьи Щелковского судебного района Московской области</option><option value="50MS0286" >Судебный участок № 286 мирового судьи Электростальского судебного района Московской области</option><option value="50MS0287" >Судебный участок № 287 мирового судьи Электростальского судебного района Московской области</option><option value="50MS0288" >Судебный участок № 288 мирового судьи Электростальского судебного района Московской области</option><option value="50MS0289" >Судебный участок № 289 мирового судьи Электростальского судебного района Московской области</option><option value="50MS0290" >Судебный участок № 290 мирового судьи Электростальского судебного района Московской области</option><option value="50MS0291" >Судебный участок № 291 мирового судьи Электростальского судебного района Московской области</option><option value="50MS0292" >Судебный участок № 292 мирового судьи Электростальского судебного района Московской области</option><option value="50MS0293" >Судебный участок № 293 мирового судьи Балашихинского судебного района Московской области</option><option value="50MS0294" >Судебный участок № 294 мирового судьи Балашихинского судебного района Московской области</option><option value="50MS0296" >Судебный участок № 296 мирового судьи Волоколамского судебного района Московской области</option><option value="50MS0297" >Судебный участок № 297 мирового судьи Долгопрудненского судебного района Московской области</option><option value="50MS0298" >Судебный участок № 298 мирового судьи Железнодорожного судебного района Московской области</option><option value="50MS0299" >Судебный участок № 299 мирового судьи Жуковского судебного района Московской области</option><option value="50MS0300" >Судебный участок № 300 мирового судьи Ивантеевского судебного района Московской области</option><option value="50MS0301" >Судебный участок № 301 мирового судьи Климовского судебного района Московской области</option><option value="50MS0302" >Судебный участок № 302 мирового судьи Королевского судебного района Московской области</option><option value="50MS0303" >Судебный участок № 303 мирового судьи Лыткаринского судебного района Московской области</option><option value="50MS0304" >Судебный участок № 304 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0305" >Судебный участок № 305 мирового судьи Можайского судебного района Московской области</option><option value="50MS0306" >Судебный участок № 306 мирового судьи Мытищинского судебного района Московской области</option><option value="50MS0307" >Судебный участок № 307 мирового судьи Наро-Фоминского судебного района Московской области</option><option value="50MS0308" >Судебный участок № 308 мирового судьи Ногинского судебного района Московской области</option><option value="50MS0309" >Судебный участок № 309 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0310" >Судебный участок № 310 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0311" >Судебный участок № 311 мирового судьи Пушкинского судебного района Московской области</option><option value="50MS0312" >Судебный участок № 312 мирового судьи Раменского судебного района Московской области</option><option value="50MS0313" >Судебный участок № 313 мирового судьи Реутовского судебного района Московской области</option><option value="50MS0314" >Судебный участок № 314 мирового судьи Серебряно-Прудского судебного района Московской области</option><option value="50MS0315" >Судебный участок № 315 мирового судьи Ступинского судебного района Московской области</option><option value="50MS0316" >Судебный участок № 316 мирового судьи Чеховского судебного района Московской области</option><option value="50MS0317" >Судебный участок № 317 мирового судьи Шатурского судебного района Московской области</option><option value="50MS0318" >Судебный участок № 318 мирового судьи Шаховского судебного района Московской области</option><option value="50MS0319" >Судебный участок № 330 мирового судьи Талдомского судебного района Московской области</option><option value="50MS0320" >Судебный участок № 12 мирового судьи Балашихинского судебного района Московской области</option><option value="50MS0321" >Судебный участок № 138 мирового судьи Видновского судебного района Московской области</option><option value="50MS0322" >Судебный участок № 13 мирового судьи Воскресенского судебного района Московской области</option><option value="50MS0323" >Судебный участок № 192 мирового судьи Дмитровского судебного района Московской области</option><option value="50MS0324" >Судебный участок № 193 мирового судьи Домодедовского судебного района Московской области</option><option value="50MS0325" >Судебный участок № 195 мирового судьи Истринского судебного района Московской области</option><option value="50MS0326" >Судебный участок № 196 мирового судьи Каширского судебного района Московской области</option><option value="50MS0327" >Судебный участок № 197 мирового судьи Королевского судебного района Московской области</option><option value="50MS0328" >Судебный участок № 319 мирового судьи Красногорского судебного района Московской области</option><option value="50MS0329" >Судебный участок № 320 мирового судьи Красногорского судебного района Московской области</option><option value="50MS0330" >Судебный участок № 295 мирового судьи Лобненского судебного района Московской области</option><option value="50MS0331" >Судебный участок № 321 мирового судьи Люберецкого судебного района Московской области</option><option value="50MS0332" >Судебный участок № 322 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0333" >Судебный участок № 323 мирового судьи Одинцовского судебного района Московской области</option><option value="50MS0334" >Судебный участок № 324 мирового судьи Орехово-Зуевского судебного района Московской области</option><option value="50MS0335" >Судебный участок № 325 мирового судьи Подольского судебного района Московской области</option><option value="50MS0336" >Судебный участок № 326 мирового судьи Раменского судебного района Московской области</option><option value="50MS0337" >Судебный участок № 327 мирового судьи Реутовского судебного района Московской области</option><option value="50MS0338" >Судебный участок № 328 мирового судьи Рузского судебного района Московской области</option><option value="50MS0339" >Судебный участок № 329 мирового судьи Солнечногорского судебного района Московской области</option><option value="50MS0340" >Судебный участок № 331 мирового судьи Химкинского судебного района Московской области</option><option value="50MS0341" SELECTED>Судебный участок № 332 мирового судьи Химкинского судебного района Московской области</option><option value="50MS0342" >Судебный участок № 333 мирового судьи Чеховского судебного района Московской области</option><option value="50MS0343" >Судебный участок № 334 мирового судьи Щелковского судебного района Московской области</option>
+						</select></td>
+					<td style='padding: 7px 0 5px 10px; vertical-align: top;'><img src='/images/help.gif'  align='absmiddle' class='fieldTip' title='Выберите суд, в котором рассматривается дело'></td>
+				</tr>
+
+				<tr>
+					<td style='padding: 5px 10px 5px 0; vertical-align: top;'>Номер дела:</td>
+					<td style='padding: 5px 0 5px 0; vertical-align: top;'>
+						<input type='text' id='num_df' name='num_df' onBlur='renameNum(false)' onFocus='renameNum(true)' value='' style='width:484px;'><br><span style='font-size:11px;padding-left:2px;'>Пример: 2-303/2012</span></td>
+					<td style='padding: 7px 0 5px 10px; vertical-align: top;'><img src='/images/help.gif'  align='absmiddle' class='fieldTip' title='Введите номер дела'></td>
+				</tr>
+
+				<tr>
+					<td style='padding: 5px 10px 5px 0; vertical-align: top;'></td>
+					<td style='padding: 5px 0 5px 0; vertical-align: top;'>
+						<input type='submit' class='form-button' value='Найти' style='width: 150px;'>&nbsp;&nbsp;&nbsp;
+						<input type='button' class='form-button' value='Очистить форму'  style='width: 150px;' onclick="window.location='index.php?id=300&searchtype=sp&var=true'"></td>
+				</tr>
+				<tr>
+					<td colspan='2' id='res_show'>
+	<div align='center' style='padding:40px;'><B>По вашему запросу ничего не найдено.<BR>Попробуйте уточнить условия поиска.</B></div></td></tr></table></form>
+	</div>
+
+ <script type='text/javascript'>onloadpg();</script></div></div>
+<div style='float:left; width: 0px; height: 0px;'>
+	<script type="text/javascript">
+		cRise="ref="+encodeURIComponent(document.referrer)+"&pg="+encodeURIComponent(window.location.href)+"&rnd="+Math.random();
+		document.write("<img "+" src=\'//counter.sudrf.ru/cnt.php?ssid=portal&show=0&"+cRise+"\' alt=\'\'>");
+	</script>
+	<noscript><img src="//counter.sudrf.ru/cnt.php" alt=""></noscript>
+
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-44077329-3', 'auto');
+		ga('send', 'pageview');
+	</script>
+</div>
+</body>
+</html>
